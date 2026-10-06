@@ -1,0 +1,11 @@
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+pyarrow>=14.0
+pyyaml>=6.0
+yfinance>=0.2.40
+feedparser>=6.0
+streamlit>=1.50
+pytest>=7.4
+# Optional (better news sentiment): pip install transformers torch
+# Optional (orchestration): install Apache Airflow separately, following its constraints file

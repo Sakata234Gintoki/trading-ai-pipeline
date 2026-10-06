@@ -1,0 +1,54 @@
+# ---------------------------------------------------------------
+# Trading AI pipeline config. Edit this file, not the code.
+# ---------------------------------------------------------------
+
+tickers:                      # Yahoo Finance symbols (.NS = NSE India)
+  - RELIANCE.NS
+  - TCS.NS
+  - INFY.NS
+  - HDFCBANK.NS
+  - ICICIBANK.NS
+
+start_date: "2018-01-01"
+
+paths:                        # relative to project root
+  raw: data/raw
+  processed: data/processed
+  paper: data/paper
+
+synthetic:                    # only used with --synthetic (offline plumbing test)
+  end_date: "2025-12-31"
+  ar_phi: 0.08                # tiny autocorrelation so a working model can find *something*
+  seed: 42
+
+news:
+  feeds:                      # RSS URLs change often. Verify them before relying on them.
+    - https://economictimes.indiatimes.com/markets/stocks/rssfeeds/2146842.cms
+    - https://www.livemint.com/rss/markets
+    - https://www.moneycontrol.com/rss/marketreports.xml
+  market_close_ist: "15:30"   # news published at/after this time counts for the NEXT trading day
+  timezone: Asia/Kolkata
+  aliases:                    # keywords used to tag headlines to a ticker
+    RELIANCE.NS: [reliance]
+    TCS.NS: [tcs, tata consultancy]
+    INFY.NS: [infosys, infy]
+    HDFCBANK.NS: [hdfc bank, hdfcbank]
+    ICICIBANK.NS: [icici bank, icicibank]
+
+features:
+  use_news: true
+  sentiment: lexicon          # lexicon (no downloads) | finbert (needs transformers + torch)
+
+model:
+  models: [logreg, hgb]       # compared against baselines automatically
+  min_train_days: 500         # first walk-forward fold starts after this many trading days
+  retrain_every_days: 21      # ~monthly retraining
+  embargo_days: 1             # gap between last training day and first test day (>= horizon)
+  seed: 7
+
+backtest:
+  threshold: 0.5              # go long if P(up) > threshold, else stay in cash
+  cost_bps: 10                # per side. Brokerage + STT + slippage, roughly. Be pessimistic.
+
+paper:
+  model: logreg               # which model logs live paper predictions
